@@ -119,23 +119,6 @@ async function main(){
                 io.to(socketId).emit('roomfull',false);
                 console.log("couldn't join room full!")
             }
-
-            // console.log("count: ",count)
-            // let space_available=true;
-            // if(count>1){
-            //     space_available=false;
-            // }
-            // io.to(socketId).emit('roomfull',space_available);
-            // if(space_available){
-            //     await db.run(`INSERT INTO players (socket_id, username, room_id) VALUES (?, ?, ?);`,[socketId, userName, roomName]);
-            //     socket.join(msg.roomId);
-            //     console.log(`${msg.username} User joined room: ${msg.roomId}`);
-            //     socket.to(msg.roomId).emit('message', {username: msg.username,id: socket.id});
-            //     console.log(`user joinded ${msg.username}, room id ${msg.roomId}`)
-            // }
-            // else{
-            //     console.log("couldn't join room full!")
-            // }
         })
         socket.on("oppenents-progress",(data)=>{
             console.log('opponent: ',data.to, 'guess: ',data.body)
