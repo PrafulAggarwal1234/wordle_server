@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const axios = require('axios');
 
 const players = []; // Local array to store player information
-
+const random_players=[];
 async function fetchWord() {
     // Local array of fallback words with 5 letters
     const fallbackWords = [
@@ -61,7 +61,36 @@ async function main() {
         socket.on("username", (msg) => {
             // console.log(msg);
         });
-
+        socket.on("randomjoined",async (msg)=>{
+            const userName = msg.username;
+            let flag=true;
+            for (let player of random_players) {
+                if (player.opponent_socket_id === null) {
+                    // Update the opponent_socket_id with the current user's socket_id
+                    const answer = await fetchWord();
+                    io.to(socketId).emit("solution-word", answer);
+                    io.to(player.socket_id).emit("solution-word", answer);
+                    io.to(socketId).emit("player-joined", { username: player.username, socket_id: player.socket_id });
+                    io.to(player.socket_id).emit("player-joined", { username: userName, socket_id: socketId });
+                    player.opponent_socket_id = socketId;
+                    random_players.push({
+                        socket_id: socketId,
+                        username: userName,
+                        opponent_socket_id: player.socket_id
+                    });
+                    flag=false;
+                    break;
+                }
+            }
+            if(flag){
+                random_players.push({
+                    socket_id: socketId,
+                    username: userName,
+                    opponent_socket_id: null
+                });
+            }
+            // console.log('after inserting: ',random_players)
+        })
         socket.on("userjoined", async (msg) => {
             const userName = msg.username;
             const roomName = msg.roomId;
@@ -105,6 +134,7 @@ async function main() {
             // console.log('Client disconnected:', socket.id);
 
             const player = players.find(p => p.socket_id === socket.id);
+            const random_player = random_players.find(p => p.socket_id === socket.id);
             if (player) {
                 players.splice(players.indexOf(player), 1); // Remove player from array
                 const opponentSocketId = player.opponent_socket_id;
@@ -112,6 +142,18 @@ async function main() {
                     // console.log('disconnecting!')
                     io.to(opponentSocketId).emit('opponent-disconnected', true);
                     const opponent = players.find(p => p.socket_id === opponentSocketId);
+                    if (opponent) {
+                        opponent.opponent_socket_id = null;
+                    }
+                }
+            }
+            if(random_player){
+                random_players.splice(random_players.indexOf(random_player),1);
+                const opponentSocketId = random_player.opponent_socket_id;
+                if (opponentSocketId) {
+                    // console.log('disconnecting!')
+                    io.to(opponentSocketId).emit('opponent-disconnected', true);
+                    const opponent = random_players.find(p => p.socket_id === opponentSocketId);
                     if (opponent) {
                         opponent.opponent_socket_id = null;
                     }
