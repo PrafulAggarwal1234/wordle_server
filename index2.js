@@ -141,10 +141,10 @@ async function main() {
                 if (opponentSocketId) {
                     // console.log('disconnecting!')
                     io.to(opponentSocketId).emit('opponent-disconnected', true);
-                    const opponent = players.find(p => p.socket_id === opponentSocketId);
-                    if (opponent) {
-                        opponent.opponent_socket_id = null;
-                    }
+                    // const opponent = players.find(p => p.socket_id === opponentSocketId);
+                    // if (opponent) {
+                    //     opponent.opponent_socket_id = null;
+                    // }
                 }
             }
             if(random_player){
@@ -153,10 +153,10 @@ async function main() {
                 if (opponentSocketId) {
                     // console.log('disconnecting!')
                     io.to(opponentSocketId).emit('opponent-disconnected', true);
-                    const opponent = random_players.find(p => p.socket_id === opponentSocketId);
-                    if (opponent) {
-                        opponent.opponent_socket_id = null;
-                    }
+                    // const opponent = random_players.find(p => p.socket_id === opponentSocketId);
+                    // if (opponent) {
+                    //     opponent.opponent_socket_id = null;
+                    // }
                 }
             }
         });
